@@ -32,8 +32,13 @@ var out = byline(proc.stdout)
 
 out.on('data', function(line){
   if (process.env.DEBUG_SHIM) console.log('[shim] parsing: `%s`', line)
-  var msg = JSON.parse(line)
-  callback(msg.error, msg.value)
+  try {
+    var msg = JSON.parse(line)
+    callback(msg.error, msg.value)
+  } catch (err) {
+    if (process.env.DEBUG_SHIM) console.error('[shim] parsing error: `%s`', err)
+    callback(null, line)
+  }
 })
 
 /**
